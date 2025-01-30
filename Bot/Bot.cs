@@ -1,18 +1,22 @@
+using System;
 using UnityEngine;
 
 public class Bot : MonoBehaviour
 {
-    [SerializeField] private float _speed;
-    [SerializeField] private MovePoint _movePoint;
-    [SerializeField] private BasePoint _basePoint;
+    [SerializeField] private Transform _basePoint;
     [SerializeField] private BotCollisionHandler _collisionHandler;
+    [SerializeField] private GrabPoint _grabPoint;
 
     private bool _isGotMission = false;
     private bool _isGotResource = false;
-    private Resourñe _gatheredResourse;
+    private Resource _gatheredResourse;
 
     public bool GotMission => _isGotMission;
     public bool GotResource => _isGotResource;
+
+    public event Action<Vector3> Moving;
+    public event Action<Resource> TakeMission;
+    public event Action Stoping;
 
     private void OnEnable()
     {
@@ -22,7 +26,6 @@ public class Bot : MonoBehaviour
 
     private void Update()
     {
-        Move();
         GatherResource();
     }
 
@@ -32,10 +35,12 @@ public class Bot : MonoBehaviour
         _collisionHandler.TouchedBase -= GetToBase;
     }
 
-    public void GetMission(Resourñe resourse)
+    public void GetMission(Resource resourse)
     {
+        Stoping?.Invoke();
         _isGotMission = true;
-        _movePoint.transform.position = resourse.transform.position;
+        TakeMission?.Invoke(resourse);
+        Moving?.Invoke(resourse.transform.position);
     }
 
     private void GetToBase()
@@ -43,33 +48,19 @@ public class Bot : MonoBehaviour
         _isGotMission = false;
         _isGotResource = false;
         _gatheredResourse = null;
-        _movePoint.transform.position = transform.position;
     }
 
-    private void GetResource(Resourñe resourse)
+    private void GetResource(Resource resourse)
     {
         _gatheredResourse = resourse;
-        _gatheredResourse.IsCarryed = true;
         _isGotResource = true;
+        Stoping?.Invoke();
+        Moving?.Invoke(_basePoint.position);
     }
 
     private void GatherResource()
     {
         if (_gatheredResourse != null)
-            _gatheredResourse.transform.position = transform.position;
-    }
-
-    private void Move()
-    {
-        if (_isGotResource || !_isGotMission || !_movePoint.IsResourceThere)
-        {
-            transform.position = Vector3.Lerp(transform.position, _basePoint.transform.position, _speed * Time.deltaTime);
-            transform.LookAt(_basePoint.transform);
-        }
-        else if (_isGotMission && _movePoint.IsResourceThere)
-        {
-            transform.position = Vector3.Lerp(transform.position, _movePoint.transform.position, _speed * Time.deltaTime);
-            transform.LookAt(_movePoint.transform);
-        }
+            _gatheredResourse.transform.position = _grabPoint.transform.position;
     }
 }

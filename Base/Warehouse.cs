@@ -3,21 +3,40 @@ using UnityEngine;
 
 public class Warehouse : MonoBehaviour
 {
-    private List<Resourñe> _freeResourses = new();
-    private List<Resourñe> _occupiedResourses = new();
+    [SerializeField] private BaseCollisionHandler _baseCollisionHandler;
 
-    public List<Resourñe> FreeResourses => _freeResourses;
-    public List<Resourñe> OccupiedResourses => _occupiedResourses;
+    private List<Resource> _freeResources = new();
+    private List<Resource> _occupiedResources = new();
 
-    public void GetFoundedResourses(Resourñe resourse)
+    public List<Resource> FreeResources => _freeResources;
+    public List<Resource> OccupiedResources => _occupiedResources;
+
+    private void OnEnable()
     {
-        if (resourse != null)
-            _freeResourses.Add(resourse);
+        _baseCollisionHandler.ResourseCollecting += RemoveCollectedResources;
     }
 
-    public void UnfreedResources(Resourñe resourse)
+    private void OnDisable()
     {
-        _occupiedResourses.Add(resourse);
-        _freeResourses.Remove(resourse);
+        _baseCollisionHandler.ResourseCollecting -= RemoveCollectedResources;
+    }
+
+    public void UnfreedResources(Resource resourse)
+    {
+        _occupiedResources.Add(resourse);
+        _freeResources.Remove(resourse);
+    }
+
+    public void GetResources(List<Resource> resources)
+    {
+        foreach (Resource resource in resources)
+        {
+            _freeResources.Add(resource);
+        }
+    }
+
+    private void RemoveCollectedResources(Resource resource)
+    {
+        _occupiedResources.Remove(resource);
     }
 }

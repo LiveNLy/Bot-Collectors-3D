@@ -3,14 +3,14 @@ using UnityEngine;
 
 public class BaseCollisionHandler : MonoBehaviour
 {
-    public event Action<Resourñe> ResourseCollecting;
+    public event Action<Resource> ResourseCollecting;
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.TryGetComponent(out Resourñe resourse))
+        if (other.gameObject.TryGetComponent(out Resource resourse))
         {
-            resourse.IsCarryed = false;
             ResourseCollecting?.Invoke(resourse);
+            resourse.ActionAfterHit();
         }
     }
 }

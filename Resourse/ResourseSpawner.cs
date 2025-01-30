@@ -5,24 +5,23 @@ using Random = UnityEngine.Random;
 
 public class ResourseSpawner : MonoBehaviour
 {
-    [SerializeField] private Resourñe _prefab;
+    [SerializeField] private Resource _prefab;
     [SerializeField] private int _poolDefaultCapacity = 5;
     [SerializeField] private int _poolMaxSize = 12;
-    [SerializeField] private BaseCollisionHandler _collisionHandler;
     [SerializeField] private float _secondsTillSpawn = 7;
 
     private WaitForSeconds _wait;
     private Coroutine _coroutine;
 
-    private ObjectPool<Resourñe> _pool;
+    private ObjectPool<Resource> _pool;
 
     private void Awake()
     {
         _wait = new WaitForSeconds(_secondsTillSpawn);
 
-        _pool = new ObjectPool<Resourñe>(
-            actionOnGet: (res) => SetObject(res),
-            createFunc: () => InstantiateObject(),
+        _pool = new ObjectPool<Resource>(
+            actionOnGet: (res) => PlaceResource(res),
+            createFunc: () => InstantiateResource(),
             actionOnRelease: (res) => res.gameObject.SetActive(false),
             actionOnDestroy: (res) => Destroy(res),
             collectionCheck: true,
@@ -30,45 +29,36 @@ public class ResourseSpawner : MonoBehaviour
             maxSize: _poolMaxSize);
     }
 
-    private void OnEnable()
-    {
-        _collisionHandler.ResourseCollecting += ReleaseObject;
-    }
-
     private void Start()
     {
-        _coroutine = StartCoroutine(SpawnObject());
+        _coroutine = StartCoroutine(SpawnResource());
     }
 
-    private void OnDisable()
-    {
-        _collisionHandler.ResourseCollecting += ReleaseObject;
-    }
-
-    public void ReleaseObject(Resourñe resource)
+    public void ReleaseResource(Resource resource)
     {
         _pool.Release(resource);
+        resource.ReleaseResource -= ReleaseResource;
     }
 
-    private void GetObject()
+    private void GetResource()
     {
         _pool.Get();
     }
 
-    private void SetObject(Resourñe resource)
+    private void PlaceResource(Resource resource)
     {
         resource.transform.position = SetPosition();
-        resource.HasBeenScaned = false;
         resource.gameObject.SetActive(true);
+        resource.ReleaseResource += ReleaseResource;
     }
 
     private Vector3 SetPosition()
     {
-        Vector3 position = transform.position;
+        Vector3 position = transform.localPosition;
         float minRandomX = -15f;
         float maxRandomX = 15f;
-        float minRandomZ = -11f;
-        float maxRandomZ = 11f;
+        float minRandomZ = -10f;
+        float maxRandomZ = 10f;
 
         position.x = transform.position.x - Random.Range(minRandomX, maxRandomX);
         position.z = transform.position.z - Random.Range(minRandomZ, maxRandomZ);
@@ -77,16 +67,16 @@ public class ResourseSpawner : MonoBehaviour
         return position;
     }
 
-    private Resourñe InstantiateObject()
+    private Resource InstantiateResource()
     {
         return Instantiate(_prefab);
     }
 
-    private IEnumerator SpawnObject()
+    private IEnumerator SpawnResource()
     {
         while (enabled)
         {
-            GetObject();
+            GetResource();
             yield return _wait;
         }
     }

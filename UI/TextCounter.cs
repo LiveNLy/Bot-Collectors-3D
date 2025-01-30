@@ -18,7 +18,7 @@ public class TextCounter : MonoBehaviour
         _collisionHandler.ResourseCollecting -= Count;
     }
 
-    private void Count(Resourñe resourse)
+    private void Count(Resource resourse)
     {
         ++_counter;
         _text.text = $"Ðåñóðñû: {_counter}";
