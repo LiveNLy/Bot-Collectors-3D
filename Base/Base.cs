@@ -1,13 +1,9 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Base : MonoBehaviour
 {
-    [SerializeField] private Warehouse _warehouse;
+    [SerializeField] private ResourceAllocator _resourceWarehouse;
     [SerializeField] private BaseBotsGarage _botsGarage;
-
-    private Coroutine _coroutine;
-    private WaitForSeconds _wait = new WaitForSeconds(1);
 
     private void Update()
     {
@@ -16,11 +12,11 @@ public class Base : MonoBehaviour
 
     private void GiveJobToBots()
     {
-        if (_warehouse.FreeResources.Count == 0)
+        if (_resourceWarehouse.FreeObjects.Count == 0)
             return;
 
-        Bot bot = GetNextBot();
-        Resource resource = GetNextResource();
+        Bot bot = _botsGarage.GetNextItem();
+        Resource resource = _resourceWarehouse.GetNextItem();
 
         _botsGarage.FreedBot();
 
@@ -32,21 +28,9 @@ public class Base : MonoBehaviour
 
     private void DispatchBot(Bot bot, Resource resource)
     {
-        _warehouse.UnfreedResources(resource);
+        _resourceWarehouse.UnfreedResources(resource);
         _botsGarage.UnfreedBot(bot);
 
         bot.GetMission(resource);
-    }
-
-    private Bot GetNextBot() => GetNextItem(_botsGarage.FreeBots);
-
-    private Resource GetNextResource() => GetNextItem(_warehouse.FreeResources);
-
-    private T GetNextItem<T>(List<T> itemList)
-    {
-        if (itemList.Count == 0)
-            return default;
-
-        return itemList[0];
     }
 }

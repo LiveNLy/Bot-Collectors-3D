@@ -4,23 +4,23 @@ using UnityEngine;
 public class TextCounter : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI _text;
-    [SerializeField] private BaseCollisionHandler _collisionHandler;
+    [SerializeField] private ResourceStorage _resourceStorage;
 
-    private int _counter = 0;
+    private int _count = 0;
 
     private void OnEnable()
     {
-        _collisionHandler.ResourseCollecting += Count;
+        _resourceStorage.TextChanging += Count;
     }
 
     private void OnDisable()
     {
-        _collisionHandler.ResourseCollecting -= Count;
+        _resourceStorage.TextChanging -= Count;
     }
 
-    private void Count(Resource resourse)
+    private void Count(int count)
     {
-        ++_counter;
-        _text.text = $"Ресурсы: {_counter}";
+        _count = count + 1;
+        _text.text = $"Ресурсы: {_count}";
     }
 }

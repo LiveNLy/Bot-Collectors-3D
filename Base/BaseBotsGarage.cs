@@ -1,34 +1,28 @@
 using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
 
-public class BaseBotsGarage : MonoBehaviour
+public class BaseBotsGarage : Allocator<Bot>
 {
-    [SerializeField] private List<Bot> _freeBots;
-    private List<Bot> _occupiedBots = new();
-
-    public List<Bot> FreeBots => _freeBots;
-    public List<Bot> OccupiedBots => _occupiedBots;
+    public List<Bot> FreeObjects => _freeObjects;
 
     public void UnfreedBot(Bot bot)
     {
-        _occupiedBots.Add(bot);
-        _freeBots.Remove(bot);
+        _occupiedObjects.Add(bot);
+        _freeObjects.Remove(bot);
     }
 
     public void FreedBot()
     {
-        foreach(Bot bot in _occupiedBots)
+        foreach(Bot bot in _occupiedObjects)
         {
             if(bot.GotMission == false)
             {
-                _freeBots.Add(bot);
+                _freeObjects.Add(bot);
             }
         }
 
-        foreach(Bot bot in _freeBots)
+        foreach(Bot bot in _freeObjects)
         {
-            _occupiedBots.Remove(bot);
+            _occupiedObjects.Remove(bot);
         }
     }
 }

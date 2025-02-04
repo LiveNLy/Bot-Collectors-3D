@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class ResourceSorter : MonoBehaviour
 {
-    [SerializeField] Warehouse _warehouse;
+    [SerializeField] ResourceAllocator _warehouse;
 
     private List<Resource> _scannedResources = new();
 
@@ -24,7 +24,7 @@ public class ResourceSorter : MonoBehaviour
 
         foreach(Resource resource in _scannedResources)
         {
-            if (!_warehouse.FreeResources.Contains(resource) && !_warehouse.OccupiedResources.Contains(resource))
+            if (!_warehouse.FreeObjects.Contains(resource) && !_warehouse.OccupiedObjects.Contains(resource))
             {
                 resourses.Add(resource);
             }

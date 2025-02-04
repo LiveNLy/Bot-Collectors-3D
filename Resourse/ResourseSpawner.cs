@@ -11,7 +11,6 @@ public class ResourseSpawner : MonoBehaviour
     [SerializeField] private float _secondsTillSpawn = 7;
 
     private WaitForSeconds _wait;
-    private Coroutine _coroutine;
 
     private ObjectPool<Resource> _pool;
 
@@ -31,7 +30,7 @@ public class ResourseSpawner : MonoBehaviour
 
     private void Start()
     {
-        _coroutine = StartCoroutine(SpawnResource());
+        StartCoroutine(SpawnResource());
     }
 
     public void ReleaseResource(Resource resource)
